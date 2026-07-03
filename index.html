@@ -49,6 +49,11 @@
       --motion-slow: 1.85s;
     }
 
+    body.site-intro-active,
+    body.audience-entry:not(.catalog-active) {
+      background: linear-gradient(145deg, #faf8f5 0%, #eef2f7 45%, #f3eef8 100%);
+    }
+
     /* GPU-friendly motion defaults */
     .audience-enter,
     .neon-slide-item,
@@ -587,6 +592,7 @@
       .neon-slide-item,
       .catalog-illuminable,
       .audience-enter,
+      .site-intro-enter,
       #landingView,
       #mainAppView,
       #audienceSelector {
@@ -610,6 +616,13 @@
       .legend-burst,
       .legendary-title-shimmer {
         display: none !important;
+      }
+
+      #siteIntroScreen.reveal-active .site-intro-enter,
+      #audienceSelector.reveal-active .audience-enter {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
       }
     }
 
@@ -3160,7 +3173,7 @@
 <body class="site-intro-active audience-entry bg-[#020204] text-slate-200 font-sans min-h-screen relative overflow-x-hidden selection:bg-primaLightBlue selection:text-white">
 
     <!-- ================= INTRO DEL SITIO ================= -->
-    <div id="siteIntroScreen">
+    <div id="siteIntroScreen" class="reveal-active">
       <div class="site-intro-content max-w-2xl w-full text-center space-y-6">
         <div class="flex justify-center site-intro-enter site-intro-enter-1">
           <div class="w-20 h-20 flex items-center justify-center rounded-2xl bg-white shadow-md border border-slate-200/80">
@@ -4719,6 +4732,7 @@
 
       let catalogPrepared = false;
       let landingWidgetsReady = false;
+      let siteIntroDismissed = false;
       let scrollProgressRaf = null;
       let renderWordsTimer = null;
       let landingSearchTimer = null;
@@ -6231,6 +6245,8 @@
         return isGuideMode() ? GUIDE_COLORS.default : { border: 'border-t-[5px] border-t-slate-700', badge: 'bg-slate-800 text-slate-300 border border-slate-700/50', modal: 'bg-slate-800 text-slate-300' };
       }
 
+      document.addEventListener('DOMContentLoaded', initSiteIntro);
+
       window.onload = function() {
         loadUserWords();
         buildDictionaryIndexes();
@@ -6238,7 +6254,6 @@
         loadGuideSeason();
         applySeasonalTheme();
         pendingWordId = parseWordHash();
-        initSiteIntro();
         initKeyboardShortcuts();
         initWordsContainerDelegation();
         initPerformanceMode();
@@ -6257,34 +6272,50 @@
         if (screen) {
           screen.style.display = 'flex';
           screen.classList.remove('hide');
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => screen.classList.add('reveal-active'));
-          });
         }
       }
 
       function dismissSiteIntro() {
+        if (siteIntroDismissed) return;
+        siteIntroDismissed = true;
         unlockAudio();
+
         const screen = document.getElementById('siteIntroScreen');
         const selector = document.getElementById('audienceSelector');
         document.body.classList.remove('site-intro-active');
+
+        if (selector) {
+          selector.style.display = 'flex';
+          selector.classList.remove('hide');
+        }
+        initAudienceSelector();
+
         screen?.classList.remove('reveal-active');
         screen?.classList.add('hide');
 
         setTimeout(() => {
-          if (screen) screen.style.display = 'none';
-          if (selector) selector.style.display = 'flex';
-          initAudienceSelector();
+          if (screen) {
+            screen.style.display = 'none';
+            screen.classList.remove('hide');
+          }
         }, MOTION.selectorExit);
       }
 
       function initAudienceSelector() {
+        const selector = document.getElementById('audienceSelector');
         document.getElementById('roleStep')?.classList.remove('hidden');
         document.getElementById('curiousModeStep')?.classList.add('hidden');
+        selector?.classList.remove('hide');
+        selector?.classList.remove('reveal-active');
+        selector?.querySelectorAll('.audience-enter').forEach(el => {
+          el.style.animation = 'none';
+          el.style.opacity = '0';
+          void el.offsetHeight;
+          el.style.animation = '';
+          el.style.opacity = '';
+        });
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            document.getElementById('audienceSelector').classList.add('reveal-active');
-          });
+          requestAnimationFrame(() => selector?.classList.add('reveal-active'));
         });
       }
 
@@ -6339,6 +6370,7 @@
         closeAddModal();
 
         currentAudienceMode = null;
+        siteIntroDismissed = true;
         document.body.classList.add('audience-entry');
         document.body.classList.remove('site-intro-active', 'guide-mode', 'catalog-active', 'scroll-experience-active');
         document.documentElement.style.setProperty('--intro-length', '3.4s');
