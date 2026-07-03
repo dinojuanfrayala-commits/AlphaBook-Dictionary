@@ -12,6 +12,7 @@
   <title>Alpha Book - El Diccionario Juvenil Moderno</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Fonts: Inter y Quicksand -->
@@ -48,6 +49,11 @@
       --motion-slow: 1.85s;
     }
 
+    body.site-intro-active,
+    body.audience-entry:not(.catalog-active) {
+      background: linear-gradient(145deg, #faf8f5 0%, #eef2f7 45%, #f3eef8 100%);
+    }
+
     /* GPU-friendly motion defaults */
     .audience-enter,
     .neon-slide-item,
@@ -56,16 +62,18 @@
     #landingView,
     #mainAppView,
     #introReveal,
-    #audienceSelector {
+    #audienceSelector,
+    #siteIntroScreen {
       -webkit-font-smoothing: antialiased;
     }
 
     body.intro-active .prina-mesh-bg,
+    body.intro-active .prina-mesh-bg::before,
     body.intro-active .marquee-track-container {
       animation-play-state: paused;
     }
 
-    body.intro-active:not(.guide-mode) .prina-mesh-bg {
+    body.intro-active:not(.guide-mode) .prina-mesh-bg::before {
       transition: filter 1s var(--ease-smooth);
       filter: blur(38px);
     }
@@ -535,9 +543,15 @@
       );
       pointer-events: none;
       z-index: 1;
+      opacity: 0.55;
+      transform: translate3d(-18%, 0, 0) skewX(-14deg);
+      animation: none;
+    }
+
+    .youth-reaction-beam:hover .youth-reaction-beam-track,
+    .youth-reaction-beam.beam-visible .youth-reaction-beam-track {
       opacity: 0.82;
       animation: youthReactionBeamSweep 5s linear infinite;
-      will-change: transform;
     }
 
     .youth-reaction-beam > *:not(.youth-reaction-beam-track) {
@@ -569,7 +583,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .prina-mesh-bg,
+      .prina-mesh-bg::before,
       .marquee-track-container,
       .bottom-ambient-glow.active {
         animation: none !important;
@@ -578,6 +592,7 @@
       .neon-slide-item,
       .catalog-illuminable,
       .audience-enter,
+      .site-intro-enter,
       #landingView,
       #mainAppView,
       #audienceSelector {
@@ -601,6 +616,13 @@
       .legend-burst,
       .legendary-title-shimmer {
         display: none !important;
+      }
+
+      #siteIntroScreen.reveal-active .site-intro-enter,
+      #audienceSelector.reveal-active .audience-enter {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
       }
     }
 
@@ -735,8 +757,8 @@
         radial-gradient(at 92% 8%, rgba(244, 114, 182, 0.58) 0px, transparent 40%),
         radial-gradient(at 78% 88%, rgba(167, 139, 250, 0.48) 0px, transparent 45%),
         radial-gradient(at 42% 52%, rgba(110, 231, 183, 0.35) 0px, transparent 50%);
-      filter: blur(42px);
-      animation: prinaBgMove 18s ease infinite;
+      filter: none;
+      animation: none;
       background-size: 190% 190%;
     }
 
@@ -783,8 +805,8 @@
         radial-gradient(at 88% 12%, rgba(56, 189, 248, 0.62) 0px, transparent 40%),
         radial-gradient(at 55% 82%, rgba(74, 222, 128, 0.45) 0px, transparent 48%),
         radial-gradient(at 70% 35%, rgba(253, 224, 71, 0.5) 0px, transparent 45%);
-      filter: blur(40px);
-      animation: prinaBgMove 16s ease infinite;
+      filter: none;
+      animation: none;
       background-size: 185% 185%;
     }
 
@@ -831,8 +853,8 @@
         radial-gradient(at 86% 14%, rgba(217, 119, 6, 0.58) 0px, transparent 40%),
         radial-gradient(at 68% 86%, rgba(180, 83, 9, 0.42) 0px, transparent 48%),
         radial-gradient(at 38% 48%, rgba(251, 146, 60, 0.38) 0px, transparent 50%);
-      filter: blur(42px);
-      animation: prinaBgMove 20s ease infinite;
+      filter: none;
+      animation: none;
       background-size: 190% 190%;
     }
 
@@ -879,8 +901,8 @@
         radial-gradient(at 90% 10%, rgba(129, 140, 248, 0.58) 0px, transparent 40%),
         radial-gradient(at 62% 88%, rgba(186, 230, 253, 0.55) 0px, transparent 48%),
         radial-gradient(at 45% 45%, rgba(147, 197, 253, 0.4) 0px, transparent 50%);
-      filter: blur(44px);
-      animation: prinaBgMove 22s ease infinite;
+      filter: none;
+      animation: none;
       background-size: 195% 195%;
     }
 
@@ -927,8 +949,8 @@
         radial-gradient(at 92% 12%, rgba(147, 51, 234, 0.62) 0px, transparent 40%),
         radial-gradient(at 72% 85%, rgba(234, 179, 8, 0.4) 0px, transparent 48%),
         radial-gradient(at 40% 50%, rgba(168, 85, 247, 0.45) 0px, transparent 50%);
-      filter: blur(42px);
-      animation: prinaBgMove 17s ease infinite;
+      filter: none;
+      animation: none;
       background-size: 188% 188%;
     }
 
@@ -1146,7 +1168,7 @@
       overscroll-behavior: contain;
       background: #030307;
       pointer-events: auto;
-      will-change: opacity, transform;
+      contain: layout style;
       transform-origin: center top;
       scroll-padding-top: 1.5rem;
     }
@@ -1290,7 +1312,51 @@
       }
     }
 
-    /* Fondo con difuminado fluido y dinámico en bucle (Mesh Gradient en movimiento) adaptado a un tono oscuro y agresivo */
+    /* Rendimiento: pausar animaciones pesadas fuera de foco / en dispositivos modestos */
+    body.perf-paused .prina-mesh-bg::before,
+    body.perf-paused .marquee-track-container,
+    body.perf-paused .bottom-ambient-glow.active,
+    body.perf-paused .youth-reaction-beam-track,
+    body.perf-paused .border-laser-glow {
+      animation-play-state: paused !important;
+    }
+
+    body.site-intro-active .prina-mesh-bg::before,
+    body.audience-entry .prina-mesh-bg::before,
+    body.catalog-active .prina-mesh-bg::before,
+    body.catalog-active .bottom-ambient-glow.active,
+    body.catalog-active .marquee-track-container {
+      animation-play-state: paused;
+    }
+
+    #detailModal.hidden .border-laser-glow {
+      animation-play-state: paused;
+    }
+
+    body.perf-lite .prina-mesh-bg::before {
+      animation-duration: 36s;
+      filter: blur(32px);
+    }
+
+    body.perf-lite .marquee-track-container {
+      animation-duration: 48s;
+    }
+
+    body.perf-lite .glass-component:not(.logo-container-neon) {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    body.perf-lite .youth-reaction-beam-track {
+      animation: none !important;
+      opacity: 0.45;
+    }
+
+    body.perf-lite .youth-reaction-beam:hover .youth-reaction-beam-track {
+      animation: youthReactionBeamSweep 6s linear infinite !important;
+    }
+
+    /* Fondo con difuminado fluido — capa animada en GPU (::before) */
     .prina-mesh-bg {
       position: fixed;
       top: 0;
@@ -1298,17 +1364,36 @@
       width: 100%;
       height: 100%;
       z-index: -10;
+      pointer-events: none;
+      overflow: hidden;
       background-color: #030307;
-      background-image: 
-        radial-gradient(at 10% 20%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+      background-image:
+        radial-gradient(at 10% 20%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
         radial-gradient(at 90% 10%, rgba(0, 240, 255, 0.1) 0px, transparent 40%),
-        radial-gradient(at 80% 90%, rgba(255, 234, 0, 0.05) 0px, transparent 50%),
+        radial-gradient(at 80% 90%, rgba(255, 234, 0, 0.06) 0px, transparent 50%),
         radial-gradient(at 15% 85%, rgba(57, 255, 20, 0.05) 0px, transparent 45%),
         radial-gradient(at 50% 55%, rgba(255, 0, 85, 0.04) 0px, transparent 50%);
       background-size: 180% 180%;
-      animation: prinaBgMove 20s ease infinite;
-      will-change: background-position;
-      filter: blur(40px);
+      filter: none;
+      animation: none;
+    }
+
+    .prina-mesh-bg::before {
+      content: '';
+      position: absolute;
+      inset: -30%;
+      background-image: inherit;
+      background-color: inherit;
+      background-size: inherit;
+      background-position: 50% 45%;
+      filter: blur(42px);
+      transform: translate3d(0, 0, 0);
+      animation: prinaMeshDrift 24s ease-in-out infinite;
+    }
+
+    @keyframes prinaMeshDrift {
+      0%, 100% { transform: translate3d(-2.5%, -1.5%, 0) scale(1.04); }
+      50% { transform: translate3d(2.5%, 1.5%, 0) scale(1.06); }
     }
 
     @keyframes prinaBgMove {
@@ -1422,10 +1507,16 @@
 
     /* Tarjetas oscuras, místicas y translúcidas de cristal (Glassmorphism de alta fidelidad) */
     .word-card {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 168px;
+      contain: layout style paint;
       background: rgba(10, 11, 20, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.04);
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Modificado para que mantenga el resplandor al hacer clic (:active) */
@@ -1435,6 +1526,10 @@
       border-color: rgba(0, 240, 255, 0.4);
       box-shadow: 0 20px 40px -8px rgba(0, 240, 255, 0.2),
                   0 0 25px -2px rgba(0, 240, 255, 0.08);
+    }
+
+    #wordsContainer {
+      contain: layout style;
     }
 
     /* Cabecera translúcida elegante con desenfoque de fondo */
@@ -1512,7 +1607,6 @@
       transform: rotate(22deg) translate3d(-120%, 0, 0);
       filter: blur(48px);
       animation: beamSweep var(--intro-length) var(--ease-smooth) forwards;
-      will-change: transform;
     }
 
     /* Reflejo de cristal deslizándose que simula refracción óptica real */
@@ -1534,7 +1628,6 @@
       transform: skewX(-15deg) translate3d(-120%, 0, 0);
       animation: glassSweep var(--intro-length) var(--ease-smooth) forwards;
       z-index: 5;
-      will-change: transform;
     }
 
     /* Resplandor ambiental suave en el logo */
@@ -1986,6 +2079,7 @@
       display: flex;
       width: max-content;
       animation: marqueeMove 35s linear infinite;
+      transform: translate3d(0, 0, 0);
     }
 
     /* Al pasar el cursor, pausa el carrusel para facilitar el clic */
@@ -2113,6 +2207,96 @@
     .laser-default {
       background-image: linear-gradient(90deg, #10111a 0%, #00f0ff 35%, #ffffff 50%, #00f0ff 65%, #10111a 100%);
       box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+    }
+
+    /* =====================================================
+       SITE INTRO (DESCRIPCIÓN ANTES DEL SELECTOR)
+    ===================================================== */
+    #siteIntroScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 100001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.75rem 1.25rem;
+      overflow-y: auto;
+      background: linear-gradient(145deg, #faf8f5 0%, #eef2f7 45%, #f3eef8 100%);
+      transition: opacity var(--motion-fast) var(--ease-smooth),
+                  transform var(--motion-fast) var(--ease-smooth);
+    }
+
+    #siteIntroScreen.hide {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.015);
+    }
+
+    .site-intro-content .site-intro-enter {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+
+    #siteIntroScreen.reveal-active .site-intro-enter {
+      animation: audienceEnter 1s var(--ease-smooth) forwards;
+    }
+
+    #siteIntroScreen.reveal-active .site-intro-enter-1 { animation-delay: 0.06s; }
+    #siteIntroScreen.reveal-active .site-intro-enter-2 { animation-delay: 0.18s; }
+    #siteIntroScreen.reveal-active .site-intro-enter-3 { animation-delay: 0.32s; }
+    #siteIntroScreen.reveal-active .site-intro-enter-4 { animation-delay: 0.46s; }
+    #siteIntroScreen.reveal-active .site-intro-enter-5 { animation-delay: 0.58s; }
+
+    .site-intro-title {
+      font-family: Quicksand, sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 6.5vw, 2.85rem);
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: rgba(30, 58, 138, 0.78);
+    }
+
+    .site-intro-desc {
+      color: rgba(37, 99, 235, 0.55);
+      font-size: clamp(1.125rem, 3.4vw, 1.375rem);
+      line-height: 1.65;
+      font-weight: 500;
+      max-width: 36rem;
+      margin-inline: auto;
+    }
+
+    .site-intro-beta {
+      color: rgba(37, 99, 235, 0.38);
+      font-size: clamp(0.9375rem, 2.6vw, 1.0625rem);
+      line-height: 1.55;
+      font-weight: 500;
+      max-width: 32rem;
+      margin-inline: auto;
+      padding-top: 0.35rem;
+    }
+
+    .site-intro-continue {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.95);
+      background: rgba(37, 99, 235, 0.72);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18);
+      transition: transform 0.25s var(--ease-smooth), background 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth);
+    }
+
+    .site-intro-continue:hover {
+      transform: translateY(-1px);
+      background: rgba(37, 99, 235, 0.82);
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.24);
     }
 
     /* =====================================================
@@ -2346,7 +2530,7 @@
         radial-gradient(at 85% 15%, rgba(147, 197, 253, 0.15) 0px, transparent 45%),
         radial-gradient(at 75% 85%, rgba(253, 230, 138, 0.12) 0px, transparent 50%),
         radial-gradient(at 20% 80%, rgba(167, 243, 208, 0.12) 0px, transparent 45%);
-      filter: blur(60px);
+      filter: none;
       animation: none;
       background-size: 100% 100%;
     }
@@ -2986,10 +3170,43 @@
     }
   </style>
 </head>
-<body class="bg-[#020204] text-slate-200 font-sans min-h-screen relative overflow-x-hidden selection:bg-primaLightBlue selection:text-white">
+<body class="site-intro-active audience-entry bg-[#020204] text-slate-200 font-sans min-h-screen relative overflow-x-hidden selection:bg-primaLightBlue selection:text-white">
+
+    <!-- ================= INTRO DEL SITIO ================= -->
+    <div id="siteIntroScreen" class="reveal-active">
+      <div class="site-intro-content max-w-2xl w-full text-center space-y-6">
+        <div class="flex justify-center site-intro-enter site-intro-enter-1">
+          <div class="w-20 h-20 flex items-center justify-center rounded-2xl bg-white shadow-md border border-slate-200/80">
+            <svg viewBox="0 0 100 100" class="w-14 h-14" aria-hidden="true">
+              <path d="M 35,75 L 50,25 L 65,75" stroke="#8b5cf6" stroke-width="11" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M 45,40 L 50,25 L 55,40" stroke="#fbbf24" stroke-width="13" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+              <path d="M 55,60 C 70,55 75,70 65,75 C 55,80 50,65 65,55 C 75,48 70,35 60,40" stroke="#86efac" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <path d="M 50,25 Q 85,25 75,45 Q 65,65 85,55" stroke="#f9a8d4" stroke-width="5" fill="none" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <h1 class="site-intro-title site-intro-enter site-intro-enter-2">¡Bienvenido a Alpha Book!</h1>
+
+        <p class="site-intro-desc site-intro-enter site-intro-enter-3">
+          Un diccionario generacional que acerca mundos: la jerga que se vive hoy, contada con naturalidad para quienes la usan y con claridad para quienes quieren entenderla.
+        </p>
+
+        <p class="site-intro-beta site-intro-enter site-intro-enter-4">
+          Versión experimental en etapa beta; podría contener errores o carecer de funciones.
+        </p>
+
+        <div class="site-intro-enter site-intro-enter-5">
+          <button type="button" class="site-intro-continue" onclick="dismissSiteIntro()">
+            Continuar
+            <i class="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- ================= SELECTOR DE AUDIENCIA ================= -->
-    <div id="audienceSelector">
+    <div id="audienceSelector" style="display: none;">
       <div class="audience-selector-content max-w-3xl w-full text-center space-y-8">
         <div class="flex justify-center audience-enter audience-enter-1">
           <div class="w-20 h-20 flex items-center justify-center rounded-2xl bg-white shadow-md border border-slate-200/80">
@@ -4513,6 +4730,147 @@
         return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       }
 
+      let catalogPrepared = false;
+      let landingWidgetsReady = false;
+      let siteIntroDismissed = false;
+      let scrollProgressRaf = null;
+      let renderWordsTimer = null;
+      let landingSearchTimer = null;
+      let reactionBeamObserver = null;
+      let scrollDomCache = null;
+      const dictionaryById = new Map();
+      const wordSearchCache = Object.create(null);
+      const expandTermCache = new Map();
+      const resolveQueryCache = new Map();
+      let highlightRegexCache = null;
+      let highlightQueryKey = '';
+
+      function runWhenIdle(fn, timeout = 1800) {
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(fn, { timeout });
+        } else {
+          setTimeout(fn, 16);
+        }
+      }
+
+      function invalidateSearchCaches() {
+        expandTermCache.clear();
+        resolveQueryCache.clear();
+        highlightQueryKey = '';
+        highlightRegexCache = null;
+      }
+
+      function indexWordSearchCache(item) {
+        const aliases = SEARCH_ALIASES[item.id] || [];
+        const wordNorm = normalizeSearchText(item.word);
+        const idNorm = normalizeSearchText(item.id);
+        wordSearchCache[item.id] = {
+          blob: normalizeSearchText([item.word, item.definition, item.id, ...aliases].join(' ')),
+          wordNorm,
+          idNorm,
+          wordPhon: normalizeSearchPhonetic(wordNorm),
+          idPhon: normalizeSearchPhonetic(idNorm)
+        };
+        dictionaryById.set(item.id, item);
+      }
+
+      function buildDictionaryIndexes() {
+        dictionaryById.clear();
+        Object.keys(wordSearchCache).forEach((id) => { delete wordSearchCache[id]; });
+        invalidateSearchCaches();
+        invalidateMarqueeCache();
+        dictionary.forEach(indexWordSearchCache);
+      }
+
+      function getDictionaryWord(id) {
+        return dictionaryById.get(id) || dictionary.find(w => w.id === id) || null;
+      }
+
+      function getScrollDom() {
+        if (!scrollDomCache) {
+          scrollDomCache = {
+            overlay: document.getElementById('landingFixedOverlay'),
+            mainApp: document.getElementById('mainAppView'),
+            landing: document.getElementById('landingView')
+          };
+        }
+        return scrollDomCache;
+      }
+
+      function ensureLandingWidgets() {
+        if (landingWidgetsReady) return;
+        landingWidgetsReady = true;
+        renderPopularMarquee();
+        renderDailyWord();
+      }
+
+      function initWordsContainerDelegation() {
+        document.getElementById('wordsContainer')?.addEventListener('click', (e) => {
+          const card = e.target.closest('.word-card[data-word-id]');
+          if (card?.dataset.wordId) expandWord(card.dataset.wordId);
+        }, { passive: true });
+      }
+
+      function initPerformanceMode() {
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const lowPower = prefersReducedMotion()
+          || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
+          || (navigator.deviceMemory && navigator.deviceMemory <= 4)
+          || (conn && (conn.saveData || ['slow-2g', '2g', '3g'].includes(conn.effectiveType)));
+        if (lowPower) document.body.classList.add('perf-lite');
+
+        document.addEventListener('visibilitychange', () => {
+          document.body.classList.toggle('perf-paused', document.hidden);
+        }, { passive: true });
+
+        initReactionBeamObserver();
+      }
+
+      function initReactionBeamObserver() {
+        if (!('IntersectionObserver' in window) || prefersReducedMotion()) return;
+        reactionBeamObserver = new IntersectionObserver((entries) => {
+          entries.forEach(({ target, isIntersecting }) => {
+            target.classList.toggle('beam-visible', isIntersecting);
+          });
+        }, { root: null, rootMargin: '60px 0px', threshold: 0.06 });
+      }
+
+      function observeReactionBeamCard(card) {
+        if (reactionBeamObserver && card?.classList.contains('youth-reaction-beam')) {
+          reactionBeamObserver.observe(card);
+        }
+      }
+
+      function ensureCatalogPrepared() {
+        if (catalogPrepared) return;
+        catalogPrepared = true;
+        renderWords();
+        updateStats();
+      }
+
+      function resetCatalogPrepared() {
+        catalogPrepared = false;
+      }
+
+      function scheduleRenderWords(delay = 140) {
+        if (!isMainAppVisible()) return;
+        clearTimeout(renderWordsTimer);
+        renderWordsTimer = setTimeout(renderWords, delay);
+      }
+
+      function scheduleScrollProgress(value) {
+        virtualScrollProgress = Math.min(1, Math.max(0, value));
+        if (scrollProgressRaf !== null) return;
+        scrollProgressRaf = requestAnimationFrame(() => {
+          scrollProgressRaf = null;
+          applyScrollLandingProgress(virtualScrollProgress);
+          if (virtualScrollProgress >= 0.98 && scrollExperienceActive && !scrollCompleting && !document.body.classList.contains('catalog-active')) {
+            const searchVal = document.getElementById('landingSearchInput')?.value.trim() || '';
+            enterCatalogView({ initialSearch: searchVal, fromScroll: true });
+          }
+        });
+      }
+
       function getAudioContext() {
         if (prefersReducedMotion()) return null;
         if (!audioCtx) {
@@ -5027,7 +5385,7 @@
 
       function renderDailyWord() {
         const id = getDailyWordId();
-        const word = id ? dictionary.find(w => w.id === id) : null;
+        const word = id ? dictionaryById.get(id) : null;
         const nameEl = document.getElementById('dailyWordName');
         const hintEl = document.getElementById('dailyWordHint');
         const btn = document.getElementById('dailyWordBtn');
@@ -5088,7 +5446,7 @@
 
       function getGuideExtras(id) {
         if (GUIDE_EXTRAS[id]) return GUIDE_EXTRAS[id];
-        const word = dictionary.find(w => w.id === id);
+        const word = dictionaryById.get(id);
         return word ? buildDefaultGuideExtras(word) : null;
       }
 
@@ -5111,9 +5469,7 @@
       }
 
       function applyScrollLandingProgress(progress) {
-        const overlay = document.getElementById('landingFixedOverlay');
-        const mainApp = document.getElementById('mainAppView');
-        const landing = document.getElementById('landingView');
+        const { overlay, mainApp, landing } = getScrollDom();
         if (!overlay) return;
 
         virtualScrollProgress = Math.min(1, Math.max(0, progress));
@@ -5132,6 +5488,7 @@
             mainApp.style.visibility = 'hidden';
             mainApp.style.pointerEvents = 'none';
           } else {
+            ensureCatalogPrepared();
             mainApp.classList.remove('hidden', 'opacity-0', 'scale-95');
             mainApp.style.visibility = 'visible';
             const reveal = Math.min(1, (p - 0.05) / 0.9);
@@ -5229,8 +5586,6 @@
         mainApp.classList.add('hidden', 'catalog-pending');
         mainApp.classList.remove('opacity-0', 'scale-95');
         mainApp.style.visibility = 'hidden';
-        renderWords();
-        updateStats();
         applyScrollLandingProgress(0);
         overlay.scrollTop = 0;
 
@@ -5258,13 +5613,7 @@
         if (delta < 0 && virtualScrollProgress <= 0) return;
 
         e.preventDefault();
-        virtualScrollProgress += delta / (window.innerHeight * 0.82);
-        applyScrollLandingProgress(virtualScrollProgress);
-
-        if (virtualScrollProgress >= 0.98) {
-          const searchVal = document.getElementById('landingSearchInput')?.value.trim() || '';
-          enterCatalogView({ initialSearch: searchVal, fromScroll: true });
-        }
+        scheduleScrollProgress(virtualScrollProgress + delta / (window.innerHeight * 0.82));
       }
 
       function handleScrollTouchStart(e) {
@@ -5283,13 +5632,7 @@
         if (dy < 0 && virtualScrollProgress <= 0) return;
 
         e.preventDefault();
-        virtualScrollProgress += dy / (window.innerHeight * 0.82);
-        applyScrollLandingProgress(virtualScrollProgress);
-
-        if (virtualScrollProgress >= 0.98) {
-          const searchVal = document.getElementById('landingSearchInput')?.value.trim() || '';
-          enterCatalogView({ initialSearch: searchVal, fromScroll: true });
-        }
+        scheduleScrollProgress(virtualScrollProgress + dy / (window.innerHeight * 0.82));
       }
 
       function runCatalogEntranceAnimations() {
@@ -5306,9 +5649,6 @@
             void guideSwooosh.offsetWidth;
             guideSwooosh.classList.add('run-guide-catalog-sweep');
           }
-          illuminables.forEach((el, index) => {
-            setTimeout(() => el.classList.add('illuminated'), index * MOTION.catalogStaggerGuide);
-          });
         } else {
           const catalogSwooosh = document.getElementById('catalogSwooosh');
           if (catalogSwooosh) {
@@ -5318,10 +5658,11 @@
           }
           triggerBottomSwooosh();
           playYouthCatalogSound();
-          illuminables.forEach((el, index) => {
-            setTimeout(() => el.classList.add('illuminated'), index * MOTION.catalogStagger);
-          });
         }
+
+        requestAnimationFrame(() => {
+          illuminables.forEach(el => el.classList.add('illuminated'));
+        });
       }
 
       function enterCatalogView(options = {}) {
@@ -5333,6 +5674,7 @@
 
         disableScrollExperience();
         hideSearchSuggestions();
+        ensureCatalogPrepared();
 
         const overlay = document.getElementById('landingFixedOverlay');
         const landing = document.getElementById('landingView');
@@ -5397,8 +5739,11 @@
         const safe = escapeHtml(text);
         const q = (query || '').trim();
         if (!q) return safe;
-        const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-        return safe.replace(regex, '<mark class="search-hit">$1</mark>');
+        if (q !== highlightQueryKey) {
+          highlightQueryKey = q;
+          highlightRegexCache = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        }
+        return safe.replace(highlightRegexCache, '<mark class="search-hit">$1</mark>');
       }
 
       function normalizeSearchText(text) {
@@ -5447,6 +5792,7 @@
       function expandSearchTerm(term) {
         const base = normalizeSearchText(term);
         if (!base) return [];
+        if (expandTermCache.has(base)) return expandTermCache.get(base);
 
         const variants = new Set([base, normalizeSearchPhonetic(base)]);
         const index = getSearchAliasIndex();
@@ -5456,17 +5802,24 @@
         const routed = SEARCH_QUERY_TO_IDS[base];
         if (routed) routed.forEach(id => variants.add(normalizeSearchText(id)));
 
-        Object.entries(index).forEach(([key, ids]) => {
-          if (key === base) return;
-          if (key.includes(base) || base.includes(key) || fuzzyTokenMatch(key, base, true)) {
-            ids.forEach(id => variants.add(normalizeSearchText(id)));
-          }
-        });
+        if (base.length >= 2) {
+          Object.entries(index).forEach(([key, ids]) => {
+            if (key === base) return;
+            if (key.includes(base) || base.includes(key) || fuzzyTokenMatch(key, base, true)) {
+              ids.forEach(id => variants.add(normalizeSearchText(id)));
+            }
+          });
+        }
 
-        return [...variants].filter(Boolean);
+        const result = [...variants].filter(Boolean);
+        expandTermCache.set(base, result);
+        return result;
       }
 
       function resolveSearchQuery(rawQuery) {
+        const cacheKey = normalizeSearchText(rawQuery);
+        if (resolveQueryCache.has(cacheKey)) return resolveQueryCache.get(cacheKey);
+
         const rawTerms = getSearchTerms(rawQuery);
         const expandedTerms = new Set();
         const targetIds = new Set();
@@ -5478,7 +5831,9 @@
           if (routed) routed.forEach(id => targetIds.add(id));
         });
 
-        return { terms: [...expandedTerms], targetIds, rawTerms };
+        const result = { terms: [...expandedTerms], targetIds, rawTerms };
+        resolveQueryCache.set(cacheKey, result);
+        return result;
       }
 
       function levenshtein(a, b) {
@@ -5521,8 +5876,8 @@
       }
 
       function getWordSearchBlob(item) {
-        const aliases = SEARCH_ALIASES[item.id] || [];
-        return normalizeSearchText([item.word, item.definition, item.id, ...aliases].join(' '));
+        return wordSearchCache[item.id]?.blob
+          || normalizeSearchText([item.word, item.definition, item.id, ...(SEARCH_ALIASES[item.id] || [])].join(' '));
       }
 
       function getRoutedSearchBoost(item, rawQuery) {
@@ -5537,20 +5892,20 @@
         return boost;
       }
 
-      function getSearchMatchScore(item, rawQuery) {
-        const { terms, targetIds, rawTerms } = resolveSearchQuery(rawQuery);
+      function getSearchMatchScore(item, rawQuery, resolved = null) {
+        const query = resolved || resolveSearchQuery(rawQuery);
+        const rawTerms = query.rawTerms;
         if (!rawTerms.length) return 0;
 
+        const meta = wordSearchCache[item.id];
+        if (!meta) return 0;
+
         let score = getRoutedSearchBoost(item, rawQuery);
-        if (targetIds.has(item.id)) score = Math.max(score, 150);
+        if (query.targetIds.has(item.id)) score = Math.max(score, 150);
 
-        const blob = getWordSearchBlob(item);
-        const wordNorm = normalizeSearchText(item.word);
-        const idNorm = normalizeSearchText(item.id);
-        const wordPhon = normalizeSearchPhonetic(wordNorm);
-        const idPhon = normalizeSearchPhonetic(idNorm);
+        const { blob, wordNorm, idNorm, wordPhon, idPhon } = meta;
 
-        terms.forEach(term => {
+        query.terms.forEach(term => {
           let termBest = 0;
 
           if (wordNorm === term || idNorm === term) termBest = Math.max(termBest, 120);
@@ -5571,15 +5926,16 @@
         return score;
       }
 
-      function wordMatchesSearch(item, rawQuery) {
-        return getSearchMatchScore(item, rawQuery) > 0;
+      function wordMatchesSearch(item, rawQuery, resolved = null) {
+        return getSearchMatchScore(item, rawQuery, resolved) > 0;
       }
 
       function getSearchMatches(rawQuery, limit = 6) {
         const trimmed = (rawQuery || '').trim();
         if (!trimmed) return [];
+        const resolved = resolveSearchQuery(trimmed);
         return dictionary
-          .map(item => ({ item, score: getSearchMatchScore(item, trimmed) }))
+          .map(item => ({ item, score: getSearchMatchScore(item, trimmed, resolved) }))
           .filter(entry => entry.score > 0)
           .sort((a, b) => b.score - a.score)
           .slice(0, limit);
@@ -5630,8 +5986,11 @@
       }
 
       function handleLandingSearchInput() {
-        const input = document.getElementById('landingSearchInput');
-        renderSearchSuggestions(input?.value, 'landingSearchSuggestions', 8);
+        clearTimeout(landingSearchTimer);
+        landingSearchTimer = setTimeout(() => {
+          const input = document.getElementById('landingSearchInput');
+          renderSearchSuggestions(input?.value, 'landingSearchSuggestions', 8);
+        }, 120);
       }
 
       function loadUserWords() {
@@ -5660,26 +6019,36 @@
         } catch {}
       }
 
+      let marqueeHtmlCache = { youth: '', guide: '' };
+
+      function invalidateMarqueeCache() {
+        marqueeHtmlCache.youth = '';
+        marqueeHtmlCache.guide = '';
+      }
+
       function renderPopularMarquee() {
         const group1 = document.getElementById('marqueeGroup1');
         const group2 = document.getElementById('marqueeGroup2');
         if (!group1 || !group2) return;
 
-        const btnClass = isGuideMode()
-          ? 'px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 hover:text-violet-700 font-semibold text-xs rounded-xl border border-slate-200 shadow-sm transition-all duration-300 text-left'
-          : 'px-4 py-2 bg-slate-900/60 hover:bg-slate-900/90 text-slate-300 hover:text-primaLightBlue font-semibold text-xs rounded-xl border border-slate-800/80 shadow-sm transition-all duration-300 text-left';
+        const modeKey = isGuideMode() ? 'guide' : 'youth';
+        if (!marqueeHtmlCache[modeKey]) {
+          const btnClass = modeKey === 'guide'
+            ? 'px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 hover:text-violet-700 font-semibold text-xs rounded-xl border border-slate-200 shadow-sm transition-all duration-300 text-left'
+            : 'px-4 py-2 bg-slate-900/60 hover:bg-slate-900/90 text-slate-300 hover:text-primaLightBlue font-semibold text-xs rounded-xl border border-slate-800/80 shadow-sm transition-all duration-300 text-left';
 
-        const html = POPULAR_WORD_IDS
-          .map(id => dictionary.find(w => w.id === id))
-          .filter(Boolean)
-          .map(w => {
-            const emoji = POPULAR_EMOJI[w.id] || '📖';
-            return `<button type="button" onclick="goToWordDirectly('${w.id}')" class="${btnClass}">${emoji} ${escapeHtml(w.word)}</button>`;
-          })
-          .join('');
+          marqueeHtmlCache[modeKey] = POPULAR_WORD_IDS
+            .map(id => dictionaryById.get(id))
+            .filter(Boolean)
+            .map(w => {
+              const emoji = POPULAR_EMOJI[w.id] || '📖';
+              return `<button type="button" onclick="goToWordDirectly('${w.id}')" class="${btnClass}">${emoji} ${escapeHtml(w.word)}</button>`;
+            })
+            .join('');
+        }
 
-        group1.innerHTML = html;
-        group2.innerHTML = html;
+        group1.innerHTML = marqueeHtmlCache[modeKey];
+        group2.innerHTML = marqueeHtmlCache[modeKey];
       }
 
       function setWordHash(id) {
@@ -5700,12 +6069,6 @@
         pendingWordId = null;
         showMainView('');
         setTimeout(() => expandWord(id), MOTION.viewSwitchYouth + 250);
-      }
-
-      function exploreRandomWord() {
-        if (!dictionary.length) return;
-        const pick = dictionary[Math.floor(Math.random() * dictionary.length)];
-        goToWordDirectly(pick.id);
       }
 
       function initKeyboardShortcuts() {
@@ -5882,31 +6245,77 @@
         return isGuideMode() ? GUIDE_COLORS.default : { border: 'border-t-[5px] border-t-slate-700', badge: 'bg-slate-800 text-slate-300 border border-slate-700/50', modal: 'bg-slate-800 text-slate-300' };
       }
 
+      document.addEventListener('DOMContentLoaded', initSiteIntro);
+
       window.onload = function() {
         loadUserWords();
+        buildDictionaryIndexes();
         loadWordReactions();
         loadGuideSeason();
         applySeasonalTheme();
         pendingWordId = parseWordHash();
-        updateStats();
-        renderDailyWord();
-        initAudienceSelector();
-        renderPopularMarquee();
         initKeyboardShortcuts();
+        initWordsContainerDelegation();
+        initPerformanceMode();
 
         window.addEventListener('hashchange', () => {
           const id = parseWordHash();
           if (id && currentAudienceMode) expandWord(id);
-        });
+        }, { passive: true });
       };
 
+      function initSiteIntro() {
+        const screen = document.getElementById('siteIntroScreen');
+        const selector = document.getElementById('audienceSelector');
+        document.body.classList.add('site-intro-active', 'audience-entry');
+        if (selector) selector.style.display = 'none';
+        if (screen) {
+          screen.style.display = 'flex';
+          screen.classList.remove('hide');
+        }
+      }
+
+      function dismissSiteIntro() {
+        if (siteIntroDismissed) return;
+        siteIntroDismissed = true;
+        unlockAudio();
+
+        const screen = document.getElementById('siteIntroScreen');
+        const selector = document.getElementById('audienceSelector');
+        document.body.classList.remove('site-intro-active');
+
+        if (selector) {
+          selector.style.display = 'flex';
+          selector.classList.remove('hide');
+        }
+        initAudienceSelector();
+
+        screen?.classList.remove('reveal-active');
+        screen?.classList.add('hide');
+
+        setTimeout(() => {
+          if (screen) {
+            screen.style.display = 'none';
+            screen.classList.remove('hide');
+          }
+        }, MOTION.selectorExit);
+      }
+
       function initAudienceSelector() {
+        const selector = document.getElementById('audienceSelector');
         document.getElementById('roleStep')?.classList.remove('hidden');
         document.getElementById('curiousModeStep')?.classList.add('hidden');
+        selector?.classList.remove('hide');
+        selector?.classList.remove('reveal-active');
+        selector?.querySelectorAll('.audience-enter').forEach(el => {
+          el.style.animation = 'none';
+          el.style.opacity = '0';
+          void el.offsetHeight;
+          el.style.animation = '';
+          el.style.opacity = '';
+        });
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            document.getElementById('audienceSelector').classList.add('reveal-active');
-          });
+          requestAnimationFrame(() => selector?.classList.add('reveal-active'));
         });
       }
 
@@ -5938,12 +6347,14 @@
       function selectAudience(mode) {
         closeAgeGate();
         currentAudienceMode = mode;
+        document.body.classList.remove('audience-entry');
         document.body.classList.toggle('guide-mode', mode === 'guide');
         document.documentElement.style.setProperty('--intro-length', mode === 'guide' ? '2.8s' : '3.4s');
         updateModeSpecificUI();
 
         const selector = document.getElementById('audienceSelector');
         selector.classList.add('hide');
+        runWhenIdle(ensureLandingWidgets, 400);
         setTimeout(() => {
           selector.style.display = 'none';
           startExperience();
@@ -5959,9 +6370,12 @@
         closeAddModal();
 
         currentAudienceMode = null;
-        document.body.classList.remove('guide-mode', 'catalog-active', 'scroll-experience-active');
+        siteIntroDismissed = true;
+        document.body.classList.add('audience-entry');
+        document.body.classList.remove('site-intro-active', 'guide-mode', 'catalog-active', 'scroll-experience-active');
         document.documentElement.style.setProperty('--intro-length', '3.4s');
         disableScrollExperience();
+        resetCatalogPrepared();
         resetScrollLandingStyles();
 
         const landing = document.getElementById('landingView');
@@ -5980,6 +6394,12 @@
         }
 
         const selector = document.getElementById('audienceSelector');
+        const siteIntro = document.getElementById('siteIntroScreen');
+        if (siteIntro) {
+          siteIntro.classList.remove('reveal-active');
+          siteIntro.classList.add('hide');
+          siteIntro.style.display = 'none';
+        }
         selector.style.display = 'flex';
         selector.classList.remove('hide');
         showRoleStep();
@@ -6044,10 +6464,6 @@
           exploreBtn.className = 'landing-action-primary landing-action-duo';
           if (changeModeText) changeModeText.textContent = 'Cambiar versión';
           if (changeModeBtn) changeModeBtn.className = 'landing-action-secondary landing-action-duo';
-          const randomBtn = document.getElementById('landingRandomBtn');
-          const randomText = document.getElementById('landingRandomText');
-          if (randomBtn) randomBtn.className = 'text-xs font-semibold text-slate-400 hover:text-primaLightBlue transition-colors flex items-center gap-1.5 mx-auto';
-          if (randomText) randomText.textContent = 'Palabra al azar';
           headerTagline.textContent = 'Construimos Entendimiento';
           if (headerTitle) headerTitle.className = 'font-display font-bold text-xl tracking-tight bg-gradient-to-r from-primaBlue via-primaLightBlue to-primaGreen bg-clip-text text-transparent';
           if (filterLabel) filterLabel.className = 'text-xs font-bold text-slate-400 uppercase tracking-wide';
@@ -6093,6 +6509,7 @@
         const landing = document.getElementById('landingView');
         const overlay = document.getElementById('landingFixedOverlay');
 
+        ensureLandingWidgets();
         document.body.classList.add('intro-active');
         restartIntroAnimations();
         overlay?.classList.remove('hidden');
@@ -6159,7 +6576,7 @@
         }
 
         renderSearchSuggestions(searchInput.value, 'catalogSearchSuggestions', 8);
-        if (isMainAppVisible()) renderWords();
+        scheduleRenderWords();
       }
 
       // Ir directo a un término de las sugerencias
@@ -6198,6 +6615,7 @@
 
         document.body.classList.remove('catalog-active');
         disableScrollExperience();
+        resetCatalogPrepared();
 
         document.getElementById('landingSearchInput').value = '';
         hideSearchSuggestions();
@@ -6227,7 +6645,7 @@
         const container = document.getElementById('wordsContainer');
         const searchInput = document.getElementById('searchInput');
         const searchVal = searchInput ? searchInput.value.trim() : '';
-        container.innerHTML = '';
+        const fragment = document.createDocumentFragment();
 
         let filtered = dictionary;
 
@@ -6239,9 +6657,12 @@
         }
 
         if (searchVal) {
+          const resolved = resolveSearchQuery(searchVal);
           filtered = filtered
-            .filter(item => wordMatchesSearch(item, searchVal))
-            .sort((a, b) => getSearchMatchScore(b, searchVal) - getSearchMatchScore(a, searchVal));
+            .map(item => ({ item, score: getSearchMatchScore(item, searchVal, resolved) }))
+            .filter(entry => entry.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .map(entry => entry.item);
         }
 
         if (filtered.length === 0) {
@@ -6261,7 +6682,6 @@
             wordCard.classList.add('youth-reaction-beam', `youth-reaction-beam--${cardReaction}`);
           }
           wordCard.style.opacity = '1';
-          wordCard.onclick = () => expandWord(word.id);
 
           const wordType = word.type || "Desconocido";
           const wordOrigin = word.origin || "No especificado";
@@ -6305,8 +6725,11 @@
               </div>
             </div>
           `;
-          container.appendChild(wordCard);
+          fragment.appendChild(wordCard);
+          observeReactionBeamCard(wordCard);
         });
+
+        container.replaceChildren(fragment);
 
         if (lastReactionFlashWordId) {
           const flashCard = container.querySelector(`.word-card[data-word-id="${lastReactionFlashWordId}"]`);
@@ -6351,7 +6774,7 @@
 
       // Abrir modal detallado con animación cyber elástica y revelación secuencial
       function expandWord(id) {
-        const word = dictionary.find(w => w.id === id);
+        const word = getDictionaryWord(id);
         if (word) {
           unlockAudio();
           playWordOpenSound(isGuideMode());
@@ -6507,6 +6930,9 @@
         };
 
         dictionary.unshift(item);
+        indexWordSearchCache(item);
+        invalidateSearchCaches();
+        invalidateMarqueeCache();
         saveUserWord(item);
         updateStats();
         renderPopularMarquee();
